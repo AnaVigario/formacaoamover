@@ -1,5 +1,5 @@
 # Use uma imagem base do Python
-FROM python:3.9
+FROM python:3-alpine3.19
 
 # Defina o diretório de trabalho no container
 WORKDIR /app
@@ -11,4 +11,4 @@ RUN pip install -r requirements.txt
 EXPOSE 80
 
 # Comando para executar o aplicativo
-CMD ["python", "formacao.py"]
+CMD ["python", "../formacao.py"]
