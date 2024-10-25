@@ -30,11 +30,11 @@ jobs:
       # Build image Docker
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:AnaVigario/formacao:1.0.0 .
+         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:anavigario/formacao:1.0.0 .
 
       #Publish image
       - name: Push Docker image
         run: |
-         docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:AnaVigario/formacao:1.0.0
+         docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:anavigario/formacao:1.0.0
 
           
