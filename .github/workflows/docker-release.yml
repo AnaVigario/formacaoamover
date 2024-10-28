@@ -10,10 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Passo 1: Fazer o checkout do repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Check out the code
         uses: action/checkout@v2
 
-      - name: et up Docker Buildx
+      - name: Get up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
       - name: Log into  Docker Hub
