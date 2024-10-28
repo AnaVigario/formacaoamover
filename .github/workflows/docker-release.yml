@@ -27,5 +27,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/jogo_do_galo:${{ github.ref_name }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/jogo_galo:${{ github.ref_name }}
         
