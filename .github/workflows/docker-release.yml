@@ -10,26 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Passo 1: Fazer o checkout do repositório
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        
-      - name: Check out the code
-        uses: action/checkout@v2
+      - name: Check out the repository
+        uses: actions/checkout@v2
 
-      - name: Get up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log into  Docker Hub
+      - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/jogo_galo:${{ github.ref_name }}
-        
+      - name: Build the Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/jogo_galo:latest .
+
+      - name: Push the Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/jogo_galo:latest
