@@ -23,4 +23,4 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.formacaoamover}}:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.repository }}:latest
