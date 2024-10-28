@@ -1,12 +1,12 @@
-name: Build and Push Docker Image on Release
+name: Build and Publish Docker Image on Release
 
-# Dispara o workflow quando uma release é publicada
+# Dispara o workflow quando uma nova release é publicada
 on:
   release:
     types: [published]
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,8 +23,12 @@ jobs:
 
       # Passo 3: Construir a imagem Docker
       - name: Build the Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/jogodogalo:latest .
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/nome-da-imagem:${{ github.sha }} .
+          docker tag ${{ secrets.DOCKER_USERNAME }}/nome-da-imagem:${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/nome-da-imagem:latest
 
       # Passo 4: Enviar a imagem para o Docker Hub
       - name: Push the Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/jogodogalo:latest
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/nome-da-imagem:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/nome-da-imagem:latest
