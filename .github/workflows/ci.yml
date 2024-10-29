@@ -26,8 +26,8 @@ jobs:
           file: .
           push: true
           tags: 
-            anavigario/formacao_amover:v1.0
-            anavigario/formacao_amover:latest
+            anavigario/formacaoamover:v1.0
+            anavigario/formacaoamover:latest
             
           
      
