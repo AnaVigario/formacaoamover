@@ -1,13 +1,14 @@
 import random
-from flask import Flask
+from flask import Flask, jsonify, request
+
 app = Flask(__name__)
 
-@app.route("/")
+# Inicializando o tabuleiro como uma variável global
+board = [[" " for _ in range(3)] for _ in range(3)]
+current_player = "X"  # Define o jogador inicial como "X"
 
 def print_board(board):
-    for row in board:
-        print(" | ".join(row))
-        print("-" * 5)
+    return "\n".join([" | ".join(row) + "\n" + "-" * 5 for row in board])
 
 def check_winner(board, player):
     # Verificar linhas, colunas e diagonais
@@ -25,49 +26,71 @@ def check_winner(board, player):
 def is_full(board):
     return all([cell != " " for row in board for cell in row])
 
-def player_move(board, player):
-    while True:
-        try:
-            move = int(input(f"Jogador {player}, escolha uma posição (1-9): ")) - 1
-            if move < 0 or move >= 9 or board[move // 3][move % 3] != " ":
-                print("Movimento inválido. Tente novamente.")
-            else:
-                board[move // 3][move % 3] = player
-                break
-        except ValueError:
-            print("Entrada inválida. Por favor, insira um número de 1 a 9.")
+def player_move(board, move, player):
+    if 0 <= move < 9 and board[move // 3][move % 3] == " ":
+        board[move // 3][move % 3] = player
+        return True
+    return False
 
 def computer_move(board):
     empty_cells = [(i, j) for i in range(3) for j in range(3) if board[i][j] == " "]
-    move = random.choice(empty_cells)
-    board[move[0]][move[1]] = "O"
+    if empty_cells:
+        move = random.choice(empty_cells)
+        board[move[0]][move[1]] = "O"
 
-def main():
-    board = [[" " for _ in range(3)] for _ in range(3)]
-    print("Bem-vindo ao Jogo do Galo!")
-    print_board(board)
+@app.route("/move", methods=["POST"])
+def make_move():
+    global board, current_player
 
-    while True:
-        # Movimento do Jogador X
-        player_move(board, "X")
-        print_board(board)
-        if check_winner(board, "X"):
-            print("Jogador X venceu!")
-            break
-        if is_full(board):
-            print("Empate!")
-            break
+    data = request.json
+    move = data.get("move")
 
-        # Movimento do Computador (O)
-        computer_move(board)
-        print("Computador fez um movimento:")
-        print_board(board)
-        if check_winner(board, "O"):
-            print("Computador venceu!")
-            break
-        if is_full(board):
-            print("Empate!")
-            break
+    if current_player != "X":
+        return jsonify({"error": "Aguarde o turno do computador."}), 400
+
+    if move is None or not (0 <= move < 9):
+        return jsonify({"error": "Movimento inválido. Escolha um número entre 1 e 9."}), 400
+
+    if not player_move(board, move, "X"):
+        return jsonify({"error": "Movimento inválido. A posição já está ocupada ou fora do limite."}), 400
+
+    # Verifica se o jogador venceu
+    if check_winner(board, "X"):
+        board_state = print_board(board)
+        board = [[" " for _ in range(3)] for _ in range(3)]  # Reinicia o tabuleiro
+        current_player = "X"
+        return jsonify({"board": board_state, "message": "Jogador X venceu!"})
+
+    # Verifica empate
+    if is_full(board):
+        board_state = print_board(board)
+        board = [[" " for _ in range(3)] for _ in range(3)]  # Reinicia o tabuleiro
+        current_player = "X"
+        return jsonify({"board": board_state, "message": "Empate!"})
+
+    # Movimento do computador
+    computer_move(board)
+    if check_winner(board, "O"):
+        board_state = print_board(board)
+        board = [[" " for _ in range(3)] for _ in range(3)]  # Reinicia o tabuleiro
+        current_player = "X"
+        return jsonify({"board": board_state, "message": "Computador venceu!"})
+
+    # Verifica empate após o movimento do computador
+    if is_full(board):
+        board_state = print_board(board)
+        board = [[" " for _ in range(3)] for _ in range(3)]  # Reinicia o tabuleiro
+        current_player = "X"
+        return jsonify({"board": board_state, "message": "Empate!"})
+
+    current_player = "X"  # Passa o turno de volta para o jogador
+    board_state = print_board(board)
+    return jsonify({"board": board_state, "message": "Movimento registrado. Turno do jogador."})
+
+@app.route("/status", methods=["GET"])
+def get_status():
+    board_state = print_board(board)
+    return jsonify({"board": board_state, "message": "Status atual do jogo"})
 
 if __name__ == "__main__":
-    main()
+    app.run(host="0.0.0.0", port=5000)
